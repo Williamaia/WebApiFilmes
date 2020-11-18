@@ -44,7 +44,6 @@ namespace WebApiFilmes.Controllers
                 });
             }
 
-
             return Ok(moviesDtos);
         }
 
@@ -83,6 +82,15 @@ namespace WebApiFilmes.Controllers
             if (movies.Count() == 0)
                 return NotFound();
 
+            return Ok(movies);
+        }
+
+        [HttpPost]
+        [Route("movies/novomovie")]
+        public ActionResult Create(Movies movies)
+        {
+            _dataContext.Movies.Add(movies);
+            _dataContext.SaveChanges();
             return Ok(movies);
         }
     }
