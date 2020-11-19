@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using WebApiFilmes.Models;
 
+
 namespace WebApiFilmes
 {
     public class Startup
@@ -32,6 +33,10 @@ namespace WebApiFilmes
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            app.UseDefaultFiles();
+            
+            app.UseStaticFiles();
 
             app.UseHttpsRedirection();
 

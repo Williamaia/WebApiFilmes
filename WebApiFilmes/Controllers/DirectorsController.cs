@@ -21,6 +21,7 @@ namespace WebApiFilmes.Controllers
             _dataContext = dataContext;
         }
 
+        [ResponseCache(Duration = 20, Location = ResponseCacheLocation.None)]
         public IActionResult Get()
         {
             List<DirectorsDto> directorsDto = new List<DirectorsDto>();
@@ -38,17 +39,6 @@ namespace WebApiFilmes.Controllers
             }
 
             return Ok(directorsDto);
-        }
-
-        [HttpGet("{id}")]
-        public IActionResult Get(int id)
-        {
-            var director = _dataContext.Directors.Find(id);
-
-            if (director == null)
-                return NotFound();
-
-            return Ok(director);
         }
 
         [HttpGet("search")]
@@ -77,12 +67,59 @@ namespace WebApiFilmes.Controllers
             return Ok(directors);
         }
 
-        [HttpPost]
-        [Route("directors/novodirector")]
-        public ActionResult Create(Directors directors)
+        [HttpGet("{id}")]
+        public ActionResult Find(int id)
         {
-            _dataContext.Directors.Add(directors);
+            var _dir = _dataContext.Directors.Where(m => m.Id == id).FirstOrDefault();
+
+            if (_dir != null)
+            {
+                return Ok(_dir);
+            }
+
+            return NotFound();
+        }
+
+        [HttpPost]
+        public ActionResult Create(DirectorsDto directors)
+        {
+            var _dir = new Directors();
+
+            _dir.Nome = directors.name;
+            _dir.Quantidade_Filmes = directors.qnt_filme;
+
+            _dataContext.Directors.Add(_dir);
             _dataContext.SaveChanges();
+            return Ok(directors);
+        }
+
+        [HttpPut]
+        public ActionResult Edit(DirectorsDto directors)
+        {
+            var _dir = _dataContext.Directors.Where(d => d.Id == directors.codigo_director).FirstOrDefault();
+
+            if (directors != null)
+            {
+                Console.WriteLine(directors.ToString());
+                _dir.Nome = directors.name;
+                _dir.Quantidade_Filmes = directors.qnt_filme;
+                _dataContext.SaveChanges();
+            }
+
+            return Ok(directors);
+        }
+
+        [HttpDelete("{id}")]
+        public ActionResult Delete(int id)
+        {
+            var directors = _dataContext.Movies.Where(_dir => _dir.Id == id).FirstOrDefault();
+
+            if (directors != null)
+            {
+                _dataContext.Movies.Remove(directors);
+                _dataContext.SaveChanges();
+            }
+
             return Ok(directors);
         }
     }

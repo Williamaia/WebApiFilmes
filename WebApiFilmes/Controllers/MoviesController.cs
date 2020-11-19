@@ -23,6 +23,8 @@ namespace WebApiFilmes.Controllers
 
         private readonly DataContext _dataContext;
 
+
+
         public MoviesController(DataContext dataContext)
         {
             _dataContext = dataContext;
@@ -47,17 +49,6 @@ namespace WebApiFilmes.Controllers
             return Ok(moviesDtos);
         }
 
-
-        [HttpGet("{id}", Name = "Get")]
-        public IActionResult Get(int id)
-        {
-            var movie = _dataContext.Movies.Find(id);
-
-            if (movie == null)
-                return NotFound();
-
-            return Ok(movie);
-        }
 
         [HttpGet("search")]
         public IActionResult Search([FromQuery]string name, [FromQuery]string sort)
@@ -85,13 +76,61 @@ namespace WebApiFilmes.Controllers
             return Ok(movies);
         }
 
-        [HttpPost]
-        [Route("movies/novomovie")]
-        public ActionResult Create(Movies movies)
+        [HttpGet("{id}")] 
+        public ActionResult Find(int id)
         {
-            _dataContext.Movies.Add(movies);
+            var _movie = _dataContext.Movies.Where(m => m.Id == id).FirstOrDefault();
+
+            if (_movie != null)
+            {
+                return Ok(_movie);
+            }
+
+            return NotFound();
+        }
+
+        [HttpPost]
+        public ActionResult Create(MoviesDto movies)
+        {
+            var _movie = new Movies();
+
+            _movie.Rank = movies.nota;
+            _movie.Title = movies.nome_filme;
+
+            _dataContext.Movies.Add(_movie);
             _dataContext.SaveChanges();
             return Ok(movies);
         }
+
+        [HttpPut]
+        public ActionResult Edit(MoviesDto movie)
+        {
+            var _movie = _dataContext.Movies.Where(m => m.Id == movie.codigo_filme).FirstOrDefault();
+
+            if (movie != null)
+            {
+                Console.WriteLine(movie.ToString());
+                _movie.Rank = movie.nota;
+                _movie.Title = movie.nome_filme;
+                _dataContext.SaveChanges();
+            }
+
+            return Ok(movie);
+        }
+
+        [HttpDelete("{id}")]
+        public ActionResult Delete(int id)
+        {
+            var movie = _dataContext.Movies.Where(_movie => _movie.Id == id).FirstOrDefault();
+
+            if(movie != null)
+            {
+                _dataContext.Movies.Remove(movie);
+                _dataContext.SaveChanges();
+            }
+
+            return Ok(movie);
+        }
+
     }
 }
